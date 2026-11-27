@@ -1,5 +1,5 @@
 <!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Cattle Terminal</title>
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; img-src 'self' data: blob:; manifest-src 'self'; connect-src 'none'; base-uri 'none'; form-action 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; img-src 'self' data: blob:; manifest-src 'self'; connect-src https://api.github.com https://gist.githubusercontent.com; base-uri 'none'; form-action 'none'">
 <meta name="referrer" content="no-referrer"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="Cattle"><meta name="theme-color" content="#0a0c0f">
 <link rel="apple-touch-icon" href="apple-touch-icon.png"><link rel="manifest" href="manifest.webmanifest">
 <style>
@@ -45,7 +45,7 @@ details>summary{cursor:pointer}
 @media(max-width:500px){.act{flex-wrap:wrap}.act .b{flex-basis:calc(100% - 40px)}.act button{margin-left:32px}}
 </style></head><body>
 <header><div class="top"><span class="brand">CATTLE TERMINAL</span><span class="mu sm">Check every price · Revise cada precio</span><span class="sp"></span>
-<select id="planSel" aria-label="Plan"></select><span class="sm mu">MXN per USD <input id="fx" type="number" step="0.01" style="width:75px"></span><button id="lang"></button></div><nav id="nav"></nav></header>
+<select id="planSel" aria-label="Plan"></select><span class="sm mu">MXN per USD <input id="fx" type="number" step="0.01" style="width:75px"></span><button id="bkpill" type="button" hidden></button><button id="sypill" type="button">SYNC OFF</button><button id="lang"></button></div><nav id="nav"></nav></header>
 <main id="main"></main><div id="tip"></div>
 <script>
 const $=s=>document.querySelector(s);
@@ -247,7 +247,7 @@ care(){return `<div class="grid">${card(T('Tasks and reminders','Tareas y record
 ${card(T('Call the vet right away if you see','Llame al veterinario de inmediato si ve'),`<ul>${[['Not eating or drinking, or separating from the others','No come o no toma agua, o se aparta'],['Swollen left side of belly, trouble breathing (can be an emergency)','Panza inflada del lado izquierdo, respira con dificultad (puede ser urgencia)'],['Fever, heavy cough, runny nose or eyes','Fiebre, tos fuerte, moco o lagrimeo'],['Diarrhea, especially bloody','Diarrea, sobre todo con sangre'],['Lameness, cannot stand, odd behavior, sudden death in the herd','Cojera, no se levanta, conducta rara, muerte repentina'],['Any wound with maggots: possible New World screwworm (gusano barrenador). Report it to SENASICA as well as the vet.','Heridas con gusanos: posible gusano barrenador. Avise a SENASICA y al veterinario.']].map(x=>`<li>${T(...x)}</li>`).join('')}</ul><div class="sm mu">${T('Vaccines, medicines and treatment are decided by a licensed veterinarian and approved by the owner. If other cattle share the land, ask the vet about separating new animals (quarantine).','El veterinario decide vacunas y tratamientos, con aprobación del dueño. Si hay otro ganado en el terreno, pregunte sobre cuarentena.')}</div>`,'c5')}
 ${card(T('Daily ranch log','Bitácora diaria'),`<div class="f">${field(T('Date','Fecha'),`<input type="date" id="gd" value="${today()}">`)}${field(T('Feed given, kg','Alimento dado, kg'),'<input id="gf" type="number">')}${field(T('Water OK?','¿Agua bien?'),`<select id="gw"><option value="1">${T('Yes','Sí')}</option><option value="0">${T('NO','NO')}</option></select>`)}${field(T('Who','Quién'),'<input id="gn">')}${field(T('What happened','Qué pasó'),'<input id="gt">')}<button class="p" data-act="addlog">+ ${T('Log','Anotar')}</button></div><div class="scroll"><table>${[...S.log].reverse().slice(0,30).map(x=>`<tr><td>${x.d}</td><td class="r">${x.feed||'—'} kg</td><td class="${x.water==='0'?'dn':''}">${T('water','agua')} ${x.water==='1'?'✓':'✕'}</td><td>${esc(x.who)}</td><td>${esc(x.t)}</td><td><button data-act="del" data-list="log" data-id="${x.id}">✕</button></td></tr>`).join('')}</table></div>`)}</div>`},
 report(){return `<div class="grid">${card(T('Update to send by WhatsApp','Reporte para WhatsApp'),`<textarea id="rep">${esc(reportText())}</textarea><button class="p" data-act="copy">${T('Copy','Copiar')}</button> <span class="sm mu">${T('Switch the language button to get it in Spanish.','Cambie el idioma para verlo en inglés.')}</span>`,'c7')}
-${card(T('Backup and restore','Respaldo'),`<p class="sm mu">${T('Your data is saved in this browser on this device only. Phones and computers do not sync. Download a backup regularly; load it on another device to copy everything (it replaces what is there).','Los datos se guardan solo en este navegador. No se sincroniza entre equipos. Descargue respaldos; al cargarlos en otro equipo reemplazan lo que haya.')}</p><div class="row"><button class="p" data-act="export">⬇ ${T('Download backup','Descargar respaldo')}</button><label>${T('Load backup','Cargar respaldo')} <input type="file" id="imp" accept=".json"></label></div><p><button data-act="reset">${T('Reset everything','Borrar todo')}</button></p>`,'c5')}</div>`}};
+${card(T('Backup and restore','Respaldo'),`<p class="sm mu">${T('Your data is saved in this browser. Other devices only get it if you turn on Phone and Mac sync above. Download a backup regularly. Loading one replaces what is on this device; with sync on, it is then combined with the cloud copy and newer records stay.','Los datos se guardan en este navegador. Otros equipos solo los reciben si activa la sincronización. Descargue respaldos. Al cargar uno se reemplazan los datos aquí; con sincronización activa se combinan con la copia en la nube.')}</p><div class="row"><button class="p" data-act="export">⬇ ${T('Download backup','Descargar respaldo')}</button><label>${T('Load backup','Cargar respaldo')} <input type="file" id="imp" accept=".json"></label></div><p><button data-act="reset">${T('Reset everything','Borrar todo')}</button></p>`,'c5')}</div>`}};
 const CHECKS=[['Written buyer terms: price per kg, live or carcass, minimum weight, payment date','Condiciones del comprador por escrito: precio, vivo o en canal, peso mínimo, fecha de pago'],['Real dressing yield from the buyer','Rendimiento en canal real del comprador'],['Real quote for the animals','Cotización real de los animales'],['Real local feed prices, delivered','Precios locales de alimento puestos en el rancho'],['Vet chosen and health plan agreed','Veterinario y plan sanitario'],['Space, shade, water and feed storage confirmed','Espacio, sombra, agua y bodega'],['Ear tags, ownership papers and movement permits confirmed locally','Aretes, papeles de propiedad y guías confirmados'],['Written agreement with whoever runs the ranch: duties, pay, profit split, who decides','Acuerdo escrito con quien atiende el rancho: tareas, pago, reparto, decisiones'],['Cash reserve for emergencies and price drops','Reserva para emergencias y caídas de precio']];
 function checklist(){S.checks=S.checks||{};return CHECKS.map((c,i)=>`<div><label><input type="checkbox" data-act="check" data-id="${i}" ${S.checks[i]?'checked':''}> ${T(...c)}</label></div>`).join('')+`<p class="mu sm">${Object.values(S.checks).filter(Boolean).length}/${CHECKS.length}</p>`}
 function reportText(){const p=P(),r=result(p),wk=addD(today(),-7),ex=activeBook().filter(x=>['expense','capital','animal_purchase'].includes(x.type)&&x.d>wk).reduce((s,x)=>s+x.c,0)/100;
@@ -302,7 +302,7 @@ document.addEventListener('change',e=>{const el=e.target;
 if(el.id==='planSel'){S.plan=el.value;sim.day=0}
 else if(el.id==='fx')S.fx=parseFloat(el.value)||S.fx;
 else if(el.id==='breed'){P().breed=el.value;save();return render()}
-else if(el.id==='imp'){const f=el.files[0];if(!f)return;f.text().then(t=>{try{const x=JSON.parse(t);if(!Array.isArray(x.plans)||!x.plans.length||!['herd','ledger','stock','tasks','log'].every(k=>Array.isArray(x[k])))throw 0;if(!confirm(T('Replace all current data with this backup?','¿Reemplazar los datos?')))return;S=upgrade(x);save();render()}catch(_){alert(T('Not a valid backup file.','Archivo no válido.'))}});return}
+else if(el.id==='imp'){const f=el.files[0];if(!f)return;f.text().then(t=>{try{const x=unwrapBackup(JSON.parse(t));if(!Array.isArray(x.plans)||!x.plans.length||!['herd','ledger','stock','tasks','log'].every(k=>Array.isArray(x[k])))throw 0;if(!confirm(T('Replace all current data with this backup?','¿Reemplazar los datos?')))return;S=upgrade(x);save();render()}catch(_){alert(T('Not a valid backup file.','Archivo no válido.'))}});return}
 else if(el.dataset.set){const k=el.dataset.set.split('.'),last=k.pop(),o=k.reduce((o,x)=>o[x],S);let v=el.value;if(el.type==='number'){v=parseFloat(v)||0;if(!/^exp\.(feedUp|priceUp)$/.test(el.dataset.set))v=Math.max(0,v);if(last==='reinvest')v=Math.min(100,v);if(last==='yld')v=Math.min(75,Math.max(30,v));if(last==='shrink'||last==='mort')v=Math.min(100,v);if(last==='head')v=Math.max(1,Math.round(v));if(last==='a'&&o.st==='q'&&v>0)o.st='est'}o[last]=v}
 else return;save();setTimeout(render,0)});
 document.addEventListener('input',e=>{const i=e.target.id;if(i==='day'){stop();sim.day=+e.target.value;drawSim()}
@@ -437,7 +437,7 @@ const enc8=new TextEncoder(),MAGIC='MMVCAT1\n';
 async function aes(pass,salt){const k=await crypto.subtle.importKey('raw',enc8.encode(pass),'PBKDF2',false,['deriveKey']);return crypto.subtle.deriveKey({name:'PBKDF2',salt,iterations:600000,hash:'SHA-256'},k,{name:'AES-GCM',length:256},false,['encrypt','decrypt'])}
 async function seal(text,pass){const salt=crypto.getRandomValues(new Uint8Array(16)),iv=crypto.getRandomValues(new Uint8Array(12)),ct=new Uint8Array(await crypto.subtle.encrypt({name:'AES-GCM',iv},await aes(pass,salt),enc8.encode(text)));const out=new Uint8Array(36+ct.length);out.set(enc8.encode(MAGIC));out.set(salt,8);out.set(iv,24);out.set(ct,36);return out}
 async function unseal(u,pass){if(new TextDecoder().decode(u.slice(0,8))!==MAGIC)throw new Error('not a backup');return new TextDecoder().decode(await crypto.subtle.decrypt({name:'AES-GCM',iv:u.slice(24,36)},await aes(pass,u.slice(8,24)),u.slice(36)))}
-function restoreText(t){const x=JSON.parse(t);if(!x||!Array.isArray(x.plans)||!x.plans.length||!x.plans.every(p=>Array.isArray(p.phases)&&Array.isArray(p.costs))||!['herd','ledger','stock','tasks','log'].every(k=>Array.isArray(x[k])))throw new Error('bad');return upgrade(x)}
+function restoreText(t){const x=unwrapBackup(JSON.parse(t));if(!x||!Array.isArray(x.plans)||!x.plans.length||!x.plans.every(p=>Array.isArray(p.phases)&&Array.isArray(p.costs))||!['herd','ledger','stock','tasks','log'].every(k=>Array.isArray(x[k])))throw new Error('bad');return upgrade(x)}
 const done=err=>{if(err)alert(err);else{save();render()}};
 document.addEventListener('click',async e=>{const b=e.target.closest('[data-act]');if(!b)return;const a=b.dataset.act,id=b.dataset.id;
 if(a==='post'){const type=val('lt'),entry={id:uid(),d:val('ld'),type,cat:type==='expense'?val('lc'):'',c:type==='death'?0:toCents(val('la')),method:['expense','capital','animal_purchase','sale'].includes(type)?val('lm'):'cash',who:val('lw'),note:val('ln'),animal:['expense','animal_purchase','sale','death'].includes(type)?val('lan'):'',rel:['pay','receive'].includes(type)?val('lr'):'',rev:''};
@@ -564,5 +564,217 @@ document.addEventListener('click',e=>{const b=e.target.closest('[data-act]');if(
  else if(a==='applyterms'){if(!S.buyer.confirmed)return;const p=P(),q=withTerms(p);if(!confirm(T(`Change plan "${p.name}" to $${q.sale} per ${unit(q)}${q.basis==='carcass'?', yield '+q.yld+'%':''}? The plan name is not changed.`,`¿Cambiar el plan "${p.name}" a $${q.sale} por ${unit(q)}? El nombre no cambia.`)))return;Object.assign(p,{basis:q.basis,sale:q.sale,yld:q.yld});save();render()}
  else if(a==='copyck'){const t=$('#ck');t.select();(navigator.clipboard?navigator.clipboard.writeText(t.value):Promise.reject()).catch(()=>document.execCommand('copy'));b.textContent=T('Copied ✓','Copiado ✓')}});
 
-S=load();render();
+/* ===== automatic backup: same method as the finance terminal (Chrome / Edge file access) ===== */
+const BK_APP='Cattle Terminal',BK_DB='cattle_bk'; /* its own database: file:// pages share one origin */
+function unwrapBackup(x){const s=x&&x.app===BK_APP&&x.state?x.state:x;if(s&&typeof s==='object')delete s.syncTag;return s} /* a restored file is combined with the cloud, never used to delete from it */
+const recCount=s=>['herd','book','log','stock','tasks','quotes','research','risks','resources','ledger'].reduce((n,k)=>n+(Array.isArray(s&&s[k])?s[k].length:0),0)+(s&&s.buyer&&s.buyer.who?1:0);
+const FSA=typeof window.showSaveFilePicker==='function';
+let bh=null,bkState='none',bkLast=0,bkTimer=null,bkBusy=false,bkAgain=false;
+function idbOp(mode,fn){return new Promise((res,rej)=>{const r=indexedDB.open(BK_DB,1);r.onupgradeneeded=()=>r.result.createObjectStore('k');r.onerror=()=>rej(r.error);r.onsuccess=()=>{const tx=r.result.transaction('k',mode),q=fn(tx.objectStore('k'));tx.oncomplete=()=>{res(q&&q.result);r.result.close()};tx.onerror=()=>rej(tx.error)}})}
+const BK_TEXT={none:['AUTO BACKUP OFF','RESPALDO AUTO APAGADO'],ok:['AUTO BACKUP OK','RESPALDO AUTO OK'],paused:['BACKUP PAUSED · click','RESPALDO EN PAUSA · clic'],error:['BACKUP ERROR · click','ERROR DE RESPALDO · clic'],guard:['BACKUP PROTECTED · click','RESPALDO PROTEGIDO · clic']};
+function bkNote(){if(bkState==='guard')return T('This terminal has no records but the backup file does, so it was NOT overwritten. Load that file under “Backup and restore” to get your records back, or choose a different file.','Esta terminal no tiene registros pero el archivo sí, así que NO se sobrescribió. Cargue ese archivo o elija otro.');
+ if(bkState==='paused')return T('Chrome needs your permission again. Click the button and allow saving.','Chrome necesita permiso otra vez.');
+ if(bkState==='error')return T('The last backup could not be written. Check that the file and folder still exist, then try again or choose the file again.','No se pudo guardar el último respaldo. Revise el archivo o elíjalo otra vez.');
+ if(bkState==='ok')return T('Rewritten a few seconds after each change while the terminal is open.','Se actualiza segundos después de cada cambio con la terminal abierta.');
+ return T('Choose the file once. It is then rewritten after every change. The file is NOT encrypted.','Elija el archivo una vez. El archivo NO está cifrado.')}
+function bkUI(){const pill=$('#bkpill');if(!pill)return;pill.hidden=!FSA;if(!FSA)return;
+ pill.textContent=T(...BK_TEXT[bkState])+(bkState==='ok'&&bkLast?' '+new Date(bkLast).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'}):'');
+ pill.style.cssText='font-size:11px;font-weight:700;color:'+(bkState==='ok'?'var(--up)':bkState==='none'?'var(--am)':'var(--dn)')}
+function bkCard(){if(!FSA)return card(T('Automatic backup','Respaldo automático'),`<p class="sm mu">${T('This browser cannot save backups by itself (this includes iPhone). Use the download buttons below. Automatic backup works in Chrome or Edge on a computer.','Este navegador no puede respaldar solo (incluye iPhone). Use los botones de descarga.')}</p>`);
+ return card(T('Automatic backup','Respaldo automático'),`<p><b>${T(...BK_TEXT[bkState])}</b>${bh?' · '+esc(bh.name):''}</p><p class="sm mu">${bkNote()}</p><div class="row">${bh?`<button class="p" data-act="bknow">${T('Back up now','Respaldar ahora')}</button><button data-act="bkpick">${T('Choose another file','Elegir otro archivo')}</button><button data-act="bkoff">${T('Stop','Detener')}</button>`:`<button class="p" data-act="bkpick">${T('Turn on automatic backup','Activar respaldo automático')}</button>`}</div>`)}
+function bkSet(state){bkState=state;bkUI();if(tab==='report')render()}
+async function writeBackup(ask){if(!bh)return;if(bkBusy){bkAgain=true;return}bkBusy=true;
+ try{let perm=await bh.queryPermission({mode:'readwrite'});if(perm!=='granted'&&ask)perm=await bh.requestPermission({mode:'readwrite'});
+  if(perm!=='granted'){if(bkState!=='paused')bkSet('paused');return}
+  let old=null;try{const t=await(await bh.getFile()).text();if(t.trim())old=unwrapBackup(JSON.parse(t))}catch(e){if(e&&e.name!=='SyntaxError')throw e}
+  if(recCount(S)===0&&recCount(old)>0){if(bkState!=='guard')bkSet('guard');return}
+  const stamp=today(),state={...S,lastBackup:stamp},w=await bh.createWritable();
+  await w.write(JSON.stringify({app:BK_APP,saved:new Date().toISOString(),records:recCount(S),encrypted:false,state}));await w.close();
+  bkLast=Date.now();if(S.lastBackup!==stamp){S.lastBackup=stamp;rawSave()}
+  if(bkState!=='ok')bkSet('ok');else bkUI()}
+ catch(e){if(bkState!=='error')bkSet('error')}
+ finally{bkBusy=false;if(bkAgain){bkAgain=false;schedBk()}}}
+function schedBk(){if(!bh)return;clearTimeout(bkTimer);bkTimer=setTimeout(()=>writeBackup(false),3000)}
+const rawSave=save;save=function(){const ok=rawSave();schedBk();return ok};
+async function pickBackup(){try{const h=await window.showSaveFilePicker({id:'cattlebk',suggestedName:'cattle-autobackup.json',types:[{description:'Cattle backup',accept:{'application/json':['.json']}}]});
+  bh=h;try{await idbOp('readwrite',s=>s.put(h,'bh'))}catch(e){}await writeBackup(true);bkUI();render()}
+ catch(e){if(e&&e.name!=='AbortError')alert(T('Could not start automatic backup: ','No se pudo activar: ')+(e.message||e))}}
+const reportV3=V.report;V.report=()=>`<div class="grid">${bkCard()}</div><p></p>`+reportV3();
+document.addEventListener('click',async e=>{if(e.target.id==='bkpill'){if(!bh)return pickBackup();if(bkState==='guard'){tab='report';return render()}return writeBackup(true)}
+ const b=e.target.closest('[data-act]');if(!b)return;const a=b.dataset.act;
+ if(a==='bkpick')pickBackup();else if(a==='bknow')writeBackup(true);else if(a==='bkoff'){bh=null;clearTimeout(bkTimer);try{await idbOp('readwrite',s=>s.delete('bh'))}catch(_){}bkSet('none')}});
+document.addEventListener('click',e=>{if(e.target.id==='lang')setTimeout(bkUI,0)});
+setInterval(()=>{if(bh&&bkState==='ok')writeBackup(false)},300000);
+document.addEventListener('visibilitychange',()=>{if(document.hidden&&bh)writeBackup(false)});
+
+/* ===== phone <-> Mac sync: encrypted, combines changes record by record ===== */
+const SY_CFG='mmv_cattle_sync',SY_DB='cattle_sync',SY_DESC='cattle-terminal-sync (encrypted)',SY_FILE='cattle-sync.json';
+const SY_LOCAL=['lang','plan','rpt','lastBackup','syncTag']; /* each device keeps its own */
+const stable=v=>Array.isArray(v)?'['+v.map(stable).join(',')+']':v&&typeof v==='object'?'{'+Object.keys(v).filter(k=>v[k]!==undefined).sort().map(k=>JSON.stringify(k)+':'+stable(v[k])).join(',')+'}':JSON.stringify(v===undefined?null:v);
+const same=(a,b)=>a===undefined||b===undefined?a===b:stable(a)===stable(b);
+const jcopy=v=>v===undefined?v:JSON.parse(JSON.stringify(v));
+const isObj=v=>v&&typeof v==='object'&&!Array.isArray(v);
+const hasIds=a=>a.every(x=>isObj(x)&&typeof x.id==='string'&&x.id);
+const SY_SETS=['weights','notes','photos']; /* lists without ids: each item is its own record */
+const labelOf=o=>isObj(o)?(o.tag||o.name||o.t||o.title||o.n||o.en||o.note||o.id||''):'';
+/* three-way merge. b = last copy both devices shared (undefined when unknown), l = this device, r = cloud.
+   Without b nothing is ever treated as deleted. When both changed one value, the cloud value stays and the other is reported. */
+function merge3(b,l,r,path,log){
+ if(same(l,r))return jcopy(l);
+ if(b!==undefined){if(same(l,b))return jcopy(r);if(same(r,b))return jcopy(l)}
+ const key=path[path.length-1];
+ if(Array.isArray(l)&&Array.isArray(r)){const ba=Array.isArray(b)?b:undefined;
+  if(SY_SETS.includes(key)){const count=a=>{const m=new Map();for(const x of a||[]){const k=stable(x);const e=m.get(k)||{n:0,x};e.n++;m.set(k,e)}return m};
+   const B=count(ba),L=count(l),R=count(r),out=[];for(const k of new Set([...R.keys(),...L.keys()])){const nb=(B.get(k)||{}).n||0,nl=(L.get(k)||{}).n||0,nr=(R.get(k)||{}).n||0;
+    const n=!ba?Math.max(nl,nr):nl===nb?nr:nr===nb?nl:Math.max(nl,nr);for(let i=0;i<n;i++)out.push(jcopy((R.get(k)||L.get(k)).x))}
+   if(key==='weights')out.sort((x,y)=>String(x.d).localeCompare(String(y.d)));return out}
+  if(hasIds(l)&&hasIds(r)&&(!ba||hasIds(ba))){const map=a=>new Map((a||[]).map(x=>[x.id,x])),B=map(ba),L=map(l),R=map(r),out=[];
+   for(const id of [...R.keys(),...[...L.keys()].filter(i=>!R.has(i))]){const x=L.get(id),y=R.get(id),o=B.get(id);
+    if(x&&y)out.push(merge3(o,x,y,[...path,labelOf(y)||id],log));
+    else{const one=x||y;if(o&&same(one,o))continue;if(o)log.push({where:path.join(' › '),what:'edited-vs-deleted',item:labelOf(one)});out.push(jcopy(one))}}
+   return out}
+  if(l.length===r.length)return r.map((y,i)=>merge3(ba&&ba.length===r.length?ba[i]:undefined,l[i],y,[...path,labelOf(y)||String(i+1)],log));
+ }
+ if(isObj(l)&&isObj(r)){const o={},bo=isObj(b)?b:undefined;
+  for(const k of new Set([...Object.keys(r),...Object.keys(l)])){const x=l[k],y=r[k],z=bo?bo[k]:undefined;let v;
+   if(x===undefined)v=z!==undefined&&same(y,z)?undefined:jcopy(y);else if(y===undefined)v=z!==undefined&&same(x,z)?undefined:jcopy(x);else v=merge3(z,x,y,[...path,k],log);
+   if(v!==undefined)o[k]=v}
+  return o}
+ log.push({where:path.join(' › '),what:'both-changed',kept:short(r),other:short(l)});return jcopy(r)}
+const short=v=>{const s=typeof v==='string'?v:JSON.stringify(v);return s==null?'':s.length>80?s.slice(0,80)+'…':s};
+const shared=s=>{const o=jcopy(s);for(const k of SY_LOCAL)delete o[k];return o};
+const withLocal=(m,s)=>{const o=jcopy(m);for(const k of SY_LOCAL)if(s[k]!==undefined)o[k]=s[k];return o};
+/* a starter plan nobody edited should not be copied into the other device */
+const planPrint=p=>{const q=jcopy(p);delete q.id;delete q.start;return stable(q)};
+function joinPrep(local){const l=shared(local),d=shared(defaults()),starters=new Set(d.plans.map(planPrint));
+ l.plans=l.plans.filter(p=>!starters.has(planPrint(p)));
+ /* settings you never changed here simply take the cloud value */
+ for(const k of Object.keys(l)){if(k==='plans')continue;if(same(l[k],d[k]))delete l[k];else if(isObj(l[k])&&isObj(d[k]))for(const j of Object.keys(l[k]))if(same(l[k][j],d[k][j]))delete l[k][j]}
+ return l}
+function mergeJoin(local,remote,log){const l=joinPrep(local),r=jcopy(remote),mine=new Set(r.plans.map(p=>p.id));
+ for(const p of l.plans)if(!mine.has(p.id)&&r.plans.some(q=>q.name===p.name))p.name+=' (from this device)';
+ return merge3(undefined,l,r,[],log)}
+/* how many records of the copy "from" are missing in "to" */
+function lost(from,to){let n=0;for(const k of ['plans','herd','book','log','stock','tasks','quotes','research','risks','resources','ledger']){const have=new Set((to[k]||[]).map(x=>x.id));n+=(from[k]||[]).filter(x=>!have.has(x.id)).length}
+ const th=new Map((to.herd||[]).map(a=>[a.id,a]));for(const a of from.herd||[]){const t=th.get(a.id);if(t)for(const k of SY_SETS)n+=Math.max(0,(a[k]||[]).length-(t[k]||[]).length)}return n}
+/* things two devices can create together that the app would normally block */
+function mergeProblems(s){const out=[],act=activeBook(s.book),dup=(arr,f)=>{const m={};for(const x of arr){const k=f(x);m[k]=(m[k]||0)+1}return Object.keys(m).filter(k=>m[k]>1)};
+ for(const t of dup(s.herd,a=>String(a.tag).trim().toLowerCase()))out.push(T('Two animals with tag ','Dos animales con arete ')+t);
+ if(dup(act.filter(x=>!['pay','receive'].includes(x.type)),x=>[x.type,x.d,x.c,x.who,x.note,x.cat].join('|')).length)out.push(T('Possible duplicate money entries (same date, type and amount).','Posibles movimientos duplicados.'));
+ if(dup(act.filter(x=>['sale','death','animal_purchase'].includes(x.type)),x=>x.animal+'|'+(x.type==='death'?'sale':x.type)).length)out.push(T('One animal has two purchases or two sales/losses in the book.','Un animal tiene dos compras o dos ventas/bajas.'));
+ for(const o of act.filter(x=>x.method==='credit'))if(openAmt(o,act)<0)out.push(T('A debt or collection was paid twice.','Una deuda o cobro se pagó dos veces.'));
+ const bad=cashOK(s.book);if(bad)out.push(T('Cash goes below zero on ','El efectivo queda negativo el ')+bad);return out}
+
+/* ---------- storage, encryption, GitHub ---------- */
+let syCfg={};try{syCfg=JSON.parse(localStorage.getItem(SY_CFG)||'{}')||{}}catch(e){}
+const syKeep=()=>{try{localStorage.setItem(SY_CFG,JSON.stringify(syCfg))}catch(e){}};
+function syDb(mode,fn){return new Promise((res,rej)=>{const q=indexedDB.open(SY_DB,1);q.onupgradeneeded=()=>q.result.createObjectStore('k');q.onerror=()=>rej(q.error);q.onsuccess=()=>{const tx=q.result.transaction('k',mode),x=fn(tx.objectStore('k'));tx.oncomplete=()=>{res(x&&x.result);q.result.close()};tx.onerror=tx.onabort=()=>{rej(tx.error);q.result.close()}}})}
+const syGet=k=>syDb('readonly',s=>s.get(k)),syPut=(k,v)=>syDb('readwrite',s=>s.put(v,k));
+const b64=u=>{let s='';for(let i=0;i<u.length;i+=32768)s+=String.fromCharCode.apply(null,u.subarray(i,i+32768));return btoa(s)},unb64=s=>Uint8Array.from(atob(s),c=>c.charCodeAt(0));
+let syKeys={};
+async function syKey(pass,salt){const id=pass+'|'+b64(salt);if(!syKeys[id])syKeys[id]=await aes(pass,salt);return syKeys[id]}
+async function syLock(obj,pass,saltText){const salt=saltText?unb64(saltText):crypto.getRandomValues(new Uint8Array(16)),iv=crypto.getRandomValues(new Uint8Array(12));
+ const ct=new Uint8Array(await crypto.subtle.encrypt({name:'AES-GCM',iv},await syKey(pass,salt),enc8.encode(JSON.stringify(obj))));return JSON.stringify({app:'Cattle Sync',v:1,salt:b64(salt),iv:b64(iv),data:b64(ct)})}
+async function syOpen(text,pass){let e;try{e=JSON.parse(text)}catch(_){throw new Error('BADFILE')}if(!e||e.app!=='Cattle Sync')throw new Error('BADFILE');
+ let pt;try{pt=await crypto.subtle.decrypt({name:'AES-GCM',iv:unb64(e.iv)},await syKey(pass,unb64(e.salt)),unb64(e.data))}catch(_){throw new Error('WRONGPASS')}
+ const o=JSON.parse(new TextDecoder().decode(pt));if(!o||!o.state||!Array.isArray(o.state.plans)||!o.state.plans.length||!o.rev||!Array.isArray(o.lineage))throw new Error('BADFILE');o.salt=e.salt;return o}
+async function gh(path,opt={}){const h={Authorization:'Bearer '+syCfg.token,Accept:'application/vnd.github+json'};if(opt.body)h['Content-Type']='application/json';
+ let r;try{r=await fetch('https://api.github.com'+path,{method:opt.method||'GET',body:opt.body,headers:h,cache:'no-store'})}catch(e){throw new Error('OFFLINE')}
+ if(r.status===401)throw new Error('BADTOKEN');if(r.status===403||r.status===429)throw new Error('LIMIT');if(r.status===404)throw new Error('NOTFOUND');if(!r.ok)throw new Error('HTTP '+r.status);return r.json()}
+async function findCopy(){for(let p=1;p<=10;p++){const a=await gh('/gists?per_page=100&page='+p);const g=a.find(x=>x.description===SY_DESC);if(g)return g.id;if(a.length<100)break}return null}
+async function readCopy(id){const g=await gh('/gists/'+id),f=g.files&&g.files[SY_FILE];if(!f)throw new Error('BADFILE');
+ if(!f.truncated)return f.content;let r;try{r=await fetch(f.raw_url,{cache:'no-store'})}catch(e){throw new Error('OFFLINE')}if(!r.ok)throw new Error('HTTP '+r.status);return r.text()}
+async function envelope(state,lineage,salt){const rev=uid()+uid(),text=await syLock({rev,lineage:[...lineage,rev].slice(-200),saved:new Date().toISOString(),state},syCfg.pass,salt);
+ if(text.length>9e6)throw new Error('TOOBIG');return{rev,text}}
+
+/* ---------- one sync pass ---------- */
+const sy={state:'off',err:'',busy:false,again:false,timer:null,last:syCfg.last||0};
+const SY_ERR={BADTOKEN:['GitHub rejected the token. Make a new one with only the gist box ticked.','GitHub rechazó el token.'],WRONGPASS:['Wrong sync passphrase. It must match the other device exactly.','Frase incorrecta. Debe ser igual en ambos.'],LIMIT:['GitHub refused for now (rate limit, or the token lacks the gist box). It will retry.','GitHub no aceptó por ahora. Reintentará.'],OFFLINE:['Could not reach GitHub. Check the internet; VPN, ad blockers or content filters can block it. Changes stay on this device and it will retry.','No se pudo conectar con GitHub. Los cambios quedan aquí y se reintentará.'],NOTFOUND:['The cloud copy was not found. Nothing on this device was changed. Disconnect, then connect again.','No se encontró la copia en la nube.'],BADFILE:['The cloud copy could not be read. Nothing on this device was changed.','No se pudo leer la copia.'],TOOBIG:['Too large to sync. Remove some photos.','Demasiado grande. Quite fotos.'],NOSAVE:['This device could not save the combined records (storage full?). Nothing was replaced.','No se pudo guardar en este equipo.'],NOCOPY:['No cloud copy yet. Start on the Mac first.','Aún no hay copia. Empiece en la Mac.'],EXISTS:['A cloud copy already exists. Use “Join” instead.','Ya existe una copia. Use “Unirse”.']};
+const syMsg=c=>SY_ERR[c]?T(...SY_ERR[c]):c;
+const connected=()=>!!(syCfg.token&&syCfg.pass&&syCfg.id);
+/* never redraw while something is half typed */
+function typing(){const a=document.activeElement;if(a&&/^(INPUT|TEXTAREA|SELECT)$/.test(a.tagName)&&!['button','checkbox','range','file'].includes(a.type))return true;
+ return [...document.querySelectorAll('#main input:not([data-set]),#main textarea:not([readonly]):not([data-set])')].some(i=>!['button','checkbox','range','file','date','hidden'].includes(i.type)&&i.value!==i.defaultValue)}
+const readStored=()=>{try{return localStorage.getItem(KEY)}catch(e){return null}};
+async function syncPass(manual,allowRemove){
+ const copyText=await readCopy(syCfg.id),remote=await syOpen(copyText,syCfg.pass),rstate=shared(upgrade(jcopy(remote.state)));
+ const meta=await syGet('meta')||{tag:'',bases:[]};
+ /* a shared base only counts if this device's records are still the ones it was made from */
+ const trusted=S.syncTag&&S.syncTag===meta.tag;
+ let base=trusted?[...meta.bases].reverse().find(x=>remote.lineage.includes(x.rev)):undefined;
+ const before=stable(S),local=shared(S),log=[];
+ let merged=base?merge3(base.state,local,rstate,[],log):mergeJoin(S,rstate,log);
+ if(!merged.plans.length)merged.plans=jcopy(rstate.plans);
+ merged=upgrade(merged);const keepS=S;S=withLocal(merged,keepS);if(!S.plans.some(p=>p.id===S.plan))S.plan=S.plans[0].id;syncStatus();const next=S;S=keepS;merged=shared(next);
+ if(base&&!allowRemove){const n=Math.max(lost(local,merged),lost(rstate,merged));if(n>5){sy.pendingRemove=n;return'confirm'}}
+ const localChanges=!same(merged,local);
+ if(localChanges&&!manual&&typing())return'wait';
+ let rev=remote.rev;
+ if(!same(merged,rstate)){const again=await syOpen(await readCopy(syCfg.id),syCfg.pass);if(again.rev!==remote.rev)return'retry';
+  const env=await envelope(merged,remote.lineage,remote.salt);rev=env.rev;await gh('/gists/'+syCfg.id,{method:'PATCH',body:JSON.stringify({files:{[SY_FILE]:{content:env.text}}})})}
+ if(stable(S)!==before)return'retry'; /* you edited while it was talking to GitHub */
+ if(localChanges&&!manual&&typing())return'wait'; /* you started typing meanwhile */
+ const tag=trusted?meta.tag:uid()+uid();
+ if(localChanges){const hist=await syGet('previous')||[];hist.push({at:new Date().toISOString(),state:jcopy(S)});await syPut('previous',hist.slice(-3));
+  if(stable(S)!==before)return'retry';if(!manual&&typing())return'wait'}
+ if(localChanges||S.syncTag!==tag){const old=S;S={...next,lang:old.lang,syncTag:tag};if(!rawSave()){S=old;throw new Error('NOSAVE')}}
+ const bases=(trusted?meta.bases:[]).filter(x=>x.rev!==rev);bases.push({rev,state:merged});await syPut('meta',{tag,bases:bases.slice(-3)});
+ if(localChanges){render();schedBk()}
+ if(log.length){syCfg.notes=[...(syCfg.notes||[]),...log.map(x=>({...x,at:today()}))].slice(-20)}
+ return'done'}
+async function syncRun(manual,allowRemove){if(!connected())return;if(sy.busy){sy.again=true;return}sy.busy=true;sy.state=sy.state==='error'?'error':'busy';syUI();
+ const work=async()=>{let res='retry';for(let i=0;i<3&&res==='retry';i++)res=await syncPass(manual,allowRemove);
+  if(res==='done'){sy.state='ok';sy.err='';sy.last=syCfg.last=Date.now();syKeep()}else if(res==='confirm'){sy.state='confirm';sy.err=''}else{sy.state='wait';sy.err='';syLater(15000)}};
+ try{if(navigator.locks)await navigator.locks.request('cattle-sync',work);else await work()}
+ catch(e){sy.state='error';sy.err=(e&&e.message)||String(e)}
+ finally{sy.busy=false;syUI();if(sy.again){sy.again=false;syLater(3000)}}}
+function syLater(ms){clearTimeout(sy.timer);sy.timer=setTimeout(()=>syncRun(false),ms)}
+async function connect(mode,token,pass){syCfg={token,pass};sy.err='';sy.state='busy';syUI();
+ try{const id=await findCopy();
+  if(mode==='create'){if(id)throw new Error('EXISTS');const tag=uid()+uid(),state=shared(S),env=await envelope(state,[],null);
+   const g=await gh('/gists',{method:'POST',body:JSON.stringify({description:SY_DESC,public:false,files:{[SY_FILE]:{content:env.text}}})});
+   syCfg.id=g.id;await syPut('meta',{tag,bases:[{rev:env.rev,state}]});S.syncTag=tag;rawSave()}
+  else{if(!id)throw new Error('NOCOPY');await syOpen(await readCopy(id),pass);syCfg.id=id;await syPut('meta',{tag:'',bases:[]});delete S.syncTag}
+  syKeep();await syncRun(true)}
+ catch(e){const code=(e&&e.message)||String(e);syCfg={};syKeep();sy.state='off';sy.err=code;syUI();alert(syMsg(code))}}
+
+/* ---------- screen ---------- */
+const SY_TEXT={off:['SYNC OFF','SINCR. APAGADA'],busy:['SYNCING…','SINCRONIZANDO…'],ok:['SYNCED','SINCRONIZADO'],wait:['SYNC WAITING · finish typing, then click','SINCR. EN ESPERA · clic'],error:['SYNC ERROR · click','ERROR DE SINCR. · clic'],confirm:['SYNC NEEDS YOU · click','SINCR. LE NECESITA · clic']};
+const syLabel=()=>T(...SY_TEXT[sy.state])+(sy.state==='ok'&&sy.last?' '+new Date(sy.last).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'}):'');
+function syBody(){const problems=connected()?mergeProblems(S):[];
+ if(!connected())return `<p class="sm mu">${T('Keeps your phone and Mac on the same records, through a locked (encrypted) copy in your GitHub account. Set up the Mac FIRST, then join from the phone. Use the same GitHub account and the same passphrase on both. The token and passphrase stay saved on each device. Do not share them with anyone: whoever has them can read and change your records, and the token reaches every gist in that GitHub account.','Mantiene teléfono y Mac con los mismos registros mediante una copia cifrada en su cuenta de GitHub. Configure PRIMERO la Mac. No comparta el token ni la frase.')}</p>
+ <div class="row"><label class="sm">GitHub token (gist)<br><input id="sy-token" type="password" autocomplete="off"></label><label class="sm">${T('Sync passphrase (12+ characters)','Frase de sincronización (12+)')}<br><input id="sy-pass" type="password" autocomplete="off"></label></div>
+ <div class="row"><button class="p" data-act="sycreate">${T('This is my Mac: start sync','Es mi Mac: empezar')}</button><button data-act="syjoin">${T('This is my phone: join','Es mi teléfono: unirse')}</button></div>
+ ${sy.err?`<p class="dn sm">${esc(syMsg(sy.err))}</p>`:''}<p class="sm mu">${T('If you forget the passphrase, the cloud copy cannot be opened. Your records stay on your devices.','Si olvida la frase, la copia no se puede abrir.')}</p>`;
+ return `<p><b>${syLabel()}</b></p>${sy.err?`<p class="dn sm">${esc(syMsg(sy.err))}</p>`:''}
+ ${sy.state==='confirm'?`<p class="dn">${T(`This sync would remove ${sy.pendingRemove} records. Nothing has changed yet. Continue only if you deleted them on purpose.`,`Esto quitaría ${sy.pendingRemove} registros. Aún no cambió nada. Continúe solo si los borró a propósito.`)}</p><div class="row"><button data-act="syremove">${T('Yes, remove them','Sí, quitarlos')}</button><button data-act="sydrop">${T('No: disconnect and keep everything here','No: desconectar')}</button></div>`:''}
+ ${problems.length?`<p class="dn"><b>${T('Check these:','Revise esto:')}</b><br>${problems.map(esc).join('<br>')}</p>`:''}
+ ${(syCfg.notes||[]).length?`<details><summary class="sm">${T('Changed on both devices','Cambiado en ambos')} (${syCfg.notes.length})</summary>${syCfg.notes.slice().reverse().map(n=>`<p class="sm">${esc(n.at)} · ${esc(n.where||'')} · ${n.what==='both-changed'?T('kept','se guardó')+' “'+esc(n.kept)+'”, '+T('not','no')+' “'+esc(n.other)+'”':T('kept an edited item the other device deleted: ','se conservó: ')+esc(String(n.item))}</p>`).join('')}<button data-act="syclear">${T('Clear this list','Borrar lista')}</button></details>`:''}
+ <p class="sm mu">${T('Syncs when the terminal is open: a few seconds after a change, when you come back to it, and about once a minute. A device that is closed or offline catches up the next time you open it. “Erase all” on a synced device does not erase the cloud: the records come back at the next sync.','Sincroniza con la terminal abierta. Un equipo cerrado o sin internet se pone al día al abrirla.')}</p>
+ <div class="row"><button class="p" data-act="synow">${T('Sync now','Sincronizar')}</button><button data-act="syprev">${T('Download this device’s copy from before the last incoming change','Descargar copia anterior')}</button><button data-act="sydrop">${T('Disconnect this device','Desconectar')}</button></div>`}
+const syCard=()=>card(T('Phone and Mac sync','Sincronizar teléfono y Mac'),`<div id="sybody">${syBody()}</div>`);
+function syUI(){const p=$('#sypill');if(p){p.textContent=connected()?syLabel():T(...SY_TEXT.off);p.style.cssText='font-size:11px;font-weight:700;color:'+(sy.state==='ok'?'var(--up)':sy.state==='error'||sy.state==='confirm'?'var(--dn)':'var(--am)')}
+ const b=$('#sybody');if(b&&!(document.activeElement&&b.contains(document.activeElement)&&document.activeElement.tagName==='INPUT')&&!(!connected()&&$('#sy-token')&&($('#sy-token').value||$('#sy-pass').value)))b.innerHTML=syBody()}
+const reportV4=V.report;V.report=()=>`<div class="grid">${syCard()}</div><p></p>`+reportV4();
+const savedV4=save;save=function(){const ok=savedV4();if(connected())syLater(4000);return ok};
+document.addEventListener('click',async e=>{if(e.target.id==='sypill'){if(connected()&&sy.state!=='confirm')syncRun(true);tab='report';render();return}
+ const b=e.target.closest('[data-act]');if(!b)return;const a=b.dataset.act;
+ if(a==='sycreate'||a==='syjoin'){const t=val('sy-token').trim(),p=val('sy-pass');if(!t)return alert(T('Paste the GitHub token.','Pegue el token.'));if(p.length<12)return alert(T('Use a passphrase of 12 or more characters.','Use 12+ caracteres.'));
+  $('#sy-token').value='';$('#sy-pass').value='';document.activeElement&&document.activeElement.blur();connect(a==='sycreate'?'create':'join',t,p)}
+ else if(a==='synow')syncRun(true);
+ else if(a==='syremove')syncRun(true,true);
+ else if(a==='sydrop'){if(!confirm(T('Disconnect this device? Records here stay. The cloud copy and other devices are not changed.','¿Desconectar? Sus registros se quedan.')))return;syCfg={};syKeep();clearTimeout(sy.timer);sy.state='off';sy.err='';delete S.syncTag;rawSave();try{await syPut('meta',{tag:'',bases:[]})}catch(_){}render();syUI()}
+ else if(a==='syclear'){syCfg.notes=[];syKeep();syUI()}
+ else if(a==='syprev'){const h=await syGet('previous')||[];if(!h.length)return alert(T('There is no earlier copy yet.','Aún no hay copia anterior.'));const x=h[h.length-1].state;dl('cattle-before-sync-'+today()+'.json',JSON.stringify(x),'application/json')}});
+document.addEventListener('click',e=>{if(e.target.id==='lang')setTimeout(syUI,0)});
+document.addEventListener('visibilitychange',()=>{if(connected())syncRun(false)});
+window.addEventListener('online',()=>{if(connected())syncRun(false)});
+window.addEventListener('focus',()=>{if(connected())syLater(1000)});
+/* two open windows on one computer: always work from what was saved last */
+window.addEventListener('storage',e=>{if(e.key===KEY&&e.newValue){S=load();render()}else if(e.key===SY_CFG){try{syCfg=JSON.parse(e.newValue||'{}')||{}}catch(_){syCfg={}}syUI()}});
+setInterval(()=>{if(connected()&&!document.hidden&&sy.state!=='confirm')syncRun(false)},60000);
+/* ===== start ===== */
+S=load();render();bkUI();
+(async()=>{if(!FSA)return;try{bh=await idbOp('readonly',s=>s.get('bh'))||null}catch(e){}if(!bh)return;bkState='paused';let p='prompt';try{p=await bh.queryPermission({mode:'readwrite'})}catch(e){}if(p==='granted'){bkState='ok';writeBackup(false)}bkUI()})();
+syUI();if(connected()){sy.state='busy';syncRun(false)}
 </script></body></html>
